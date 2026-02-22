@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+// eeee
+
 // إذا كان الأدمن مسجل دخوله بالفعل، انقله مباشرة للوحة التحكم
 if (isset($_SESSION['admin']) && $_SESSION['admin'] === true) {
     header("Location: admin/index.php");

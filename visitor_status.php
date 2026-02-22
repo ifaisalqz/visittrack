@@ -6,6 +6,9 @@ $stmt->execute([$tid]);
 $v = $stmt->fetch();
 if (!$v) { header("Location: index.php?error=notfound"); exit(); }
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
