@@ -19,115 +19,114 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s; }
-        h1, h2, h3, label, button, input, textarea { font-style: normal !important; }
+        .font-style-normal { font-style: normal !important; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen transition-colors duration-300">
+<body class="bg-slate-50 dark:bg-[#0B1120] min-h-screen transition-colors duration-300 relative flex flex-col selection:bg-blue-500 selection:text-white">
 
-<nav class="p-6 bg-white dark:bg-slate-900 sticky top-0 z-50 flex justify-between items-center px-12 border-b border-slate-100 dark:border-slate-800 shadow-sm">
-        <a href="index.php" class="text-2xl font-black text-blue-600 tracking-tighter hover:opacity-80 transition-opacity">VISIT TRACK</a>
-        
-        <div class="flex items-center gap-4 md:gap-6">
-            <button onclick="toggleDarkMode()" class="p-2 text-slate-400 hover:text-blue-600 transition-colors">
-                <svg class="w-6 h-6 dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                <svg class="w-6 h-6 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 dark:bg-blue-600/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+
+    <nav class="w-full max-w-7xl mx-auto p-6 md:px-12 flex justify-between items-center relative z-10">
+        <a href="index.php" class="text-2xl font-black text-slate-800 dark:text-white tracking-tighter font-style-normal flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            VISIT TRACK
+        </a>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleDarkMode()" class="p-3 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl transition-all">
+                <svg class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
             </button>
-            <a href="index.php" class="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 font-bold text-sm transition-colors">Home</a>
-            <a href="track.php" class="hidden md:flex items-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-5 py-2 rounded-xl font-bold text-sm border border-slate-200 dark:border-slate-700 transition-colors">Track Status</a>
-            <a href="login.php" class="px-5 py-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-xl font-bold text-sm transition-colors">Admin</a>
+            <a href="index.php" class="px-4 py-2.5 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors font-style-normal">Home</a>
         </div>
-</nav>
+    </nav>
 
-    <div class="max-w-4xl mx-auto my-12 px-6">
-        <div class="p-10 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-50 dark:border-slate-800">
+    <main class="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-4xl mx-auto relative z-10 my-8">
+        <div class="w-full bg-white dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-8 md:p-12">
+            
             <div class="text-center mb-10">
-                <span class="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest">Pre-Registration</span>
-                <h2 class="text-4xl font-extrabold tracking-tight text-slate-800 dark:text-white mt-4">Visitor Registration</h2>
-                <p class="text-slate-400 mt-2 font-medium">Please fill your details to receive your visitor pass</p>
+                <span class="px-4 py-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-500/20">New Application</span>
+                <h2 class="text-4xl font-black tracking-tighter text-slate-800 dark:text-white mt-4 font-style-normal">Visitor Registration</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium">Please fill your details below to receive your entry pass.</p>
             </div>
             
             <form action="submit_request.php" method="POST" class="space-y-8">
-                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 border-b border-slate-200 dark:border-slate-700 pb-2">1. Personal Information</h3>
+                <div class="bg-slate-50 dark:bg-[#0B1120]/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/80">
+                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 border-b border-slate-200 dark:border-slate-700/50 pb-2 font-style-normal">1. Personal Info</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Full Name</label>
-                            <input type="text" name="name" placeholder="Enter your full name" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Full Name</label>
+                            <input type="text" name="name" placeholder="Enter your full name" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">National ID / Iqama</label>
-                            <input type="text" name="national_id" placeholder="10xxxxxxxx" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">National ID / Iqama</label>
+                            <input type="text" name="national_id" placeholder="10xxxxxxxx" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Phone Number</label>
-                            <input type="tel" name="phone" placeholder="05xxxxxxxx" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Phone Number</label>
+                            <input type="tel" name="phone" placeholder="05xxxxxxxx" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Email Address</label>
-                            <input type="email" name="email" placeholder="example@email.com" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Email Address</label>
+                            <input type="email" name="email" placeholder="example@email.com" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 border-b border-slate-200 dark:border-slate-700 pb-2">2. Visit Details</h3>
+                <div class="bg-slate-50 dark:bg-[#0B1120]/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/80">
+                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 border-b border-slate-200 dark:border-slate-700/50 pb-2 font-style-normal">2. Visit Details</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Host Name</label>
-                            <input type="text" name="host_name" placeholder="Employee name" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Host Name</label>
+                            <input type="text" name="host_name" placeholder="Who are you visiting?" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Purpose of Visit</label>
-                            <input type="text" name="purpose" placeholder="Reason for visit" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Purpose of Visit</label>
+                            <input type="text" name="purpose" placeholder="Reason for visit" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black text-blue-600 uppercase ml-1">Arrival Time</label>
-                            <input type="time" name="arrival" min="07:00" max="16:00" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-none shadow-sm focus:ring-2 ring-blue-500 font-black dark:text-white">
+                            <label class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest ml-1 font-style-normal">Arrival Time</label>
+                            <input type="time" name="arrival" min="07:00" max="16:00" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black text-blue-600 uppercase ml-1">Departure Time</label>
-                            <input type="time" name="departure" min="07:00" max="16:00" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-none shadow-sm focus:ring-2 ring-blue-500 font-black dark:text-white">
+                            <label class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest ml-1 font-style-normal">Departure Time</label>
+                            <input type="time" name="departure" min="07:00" max="16:00" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 border-b border-slate-200 dark:border-slate-700 pb-2">3. Vehicle Access (Optional)</h3>
+                <div class="bg-slate-50 dark:bg-[#0B1120]/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/80">
+                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 border-b border-slate-200 dark:border-slate-700/50 pb-2 font-style-normal">3. Vehicle Access (Optional)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Car Make & Model</label>
-                            <input type="text" name="car_model" placeholder="e.g. 2024 Changan Eado Plus" class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Car Model</label>
+                            <input type="text" name="car_model" placeholder="e.g. 2024 Changan" class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase ml-1 tracking-wider">Plate Number</label>
-                            <input type="text" name="plate_number" placeholder="e.g. ABC 1234" class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm uppercase">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 font-style-normal">Plate Number</label>
+                            <input type="text" name="plate_number" placeholder="e.g. ABC 1234" class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm uppercase text-sm">
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full py-5 bg-blue-600 text-white font-black rounded-2xl transition-all text-lg uppercase tracking-widest hover:bg-blue-700 active:scale-[0.98] shadow-[0_10px_30px_-10px_rgba(37,99,235,0.5)] dark:shadow-[0_15px_40px_-10px_rgba(37,99,235,0.7)] flex justify-center items-center gap-3">
-                    <span id="btnText">Register Visit & Get QR Pass</span>
-                    <svg id="spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                <button type="submit" id="submitBtn" class="w-full py-5 bg-blue-600 text-white font-black rounded-2xl transition-all text-sm uppercase tracking-widest hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-500/30 flex justify-center items-center gap-3 font-style-normal">
+                    <span id="btnText">Register & Get Pass</span>
+                    <svg id="spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </button>
             </form>
         </div>
-    </div>
+    </main>
 
     <script>
         document.querySelector('form').addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');
-            const text = document.getElementById('btnText');
-            const spinner = document.getElementById('spinner');
-            
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
-            text.innerText = 'Processing Request...';
-            spinner.classList.remove('hidden');
+            document.getElementById('btnText').innerText = 'Processing Request...';
+            document.getElementById('spinner').classList.remove('hidden');
         });
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -135,15 +134,15 @@
             const tid = urlParams.get('tid');
             Swal.fire({
                 title: 'Registration Successful!',
-                html: `<div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-2xl my-4 text-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${tid}" class="mx-auto rounded-lg mb-3 shadow-md" alt="QR Code">
-                        <p class="text-xs font-black uppercase text-blue-400 mb-1">Tracking ID</p>
-                        <h2 class="text-2xl font-black text-blue-600 tracking-widest">${tid}</h2>
+                html: `<div class="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-2xl my-4 text-center border border-blue-100 dark:border-blue-500/20">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${tid}" class="mx-auto rounded-xl mb-4 shadow-sm" alt="QR Code">
+                        <p class="text-[10px] font-black uppercase text-blue-500 dark:text-blue-400 mb-1 tracking-widest">Tracking ID</p>
+                        <h2 class="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-widest font-mono">${tid}</h2>
                        </div>`,
                 icon: 'success',
                 confirmButtonColor: '#2563eb',
                 background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#fff',
-                color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#0f172a'
             }).then(() => { window.location.href = 'visitor_status.php?tid=' + tid; });
         }
     </script>
