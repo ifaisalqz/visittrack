@@ -18,10 +18,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
-        if ($user && $password === $user['password']) {
+        // التحقق من الباسورد المشفر
+        if ($user && password_verify($password, $user['password'])) {
             $_SESSION['admin'] = true;
             $_SESSION['admin_id'] = $user['id'];
-            $_SESSION['admin_user'] = $user['username'];
+            $_SESSION['username'] = $user['username'];
             
             header("Location: admin/index.php");
             exit();
