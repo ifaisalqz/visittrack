@@ -4,8 +4,6 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) { header("Locatio
 include '../includes/db.php';
 
 $stats = $conn->query("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'expired' THEN 1 ELSE 0 END) as completed, SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected FROM visitors WHERE status IN ('expired', 'rejected')")->fetch();
-
-// استعلام حساب الثواني
 $logs = $conn->query("SELECT *, TIMESTAMPDIFF(SECOND, actual_checkin, actual_checkout) as total_seconds FROM visitors WHERE status IN ('expired', 'rejected') ORDER BY actual_checkout DESC, created_at DESC")->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -43,10 +41,10 @@ $logs = $conn->query("SELECT *, TIMESTAMPDIFF(SECOND, actual_checkin, actual_che
         <a href="logout.php" class="p-4 text-red-400 hover:bg-red-950/30 rounded-2xl transition font-black uppercase text-[10px] text-center border border-red-900/30 tracking-widest font-style-normal">Logout</a>
     </aside>
 
-    <main class="flex-1 p-12 text-slate-800 dark:text-white">
+    <main class="flex-1 p-12 text-slate-800 dark:text-white overflow-x-hidden">
         <header class="mb-12 flex justify-between items-end">
             <div>
-                <h1 class="text-4xl font-black tracking-tight font-style-normal italic">Visitor History</h1>
+                <h1 class="text-4xl font-black tracking-tight font-style-normal italic">Visitor History Archive</h1>
                 <p class="text-slate-400 mt-2 font-medium font-style-normal">Detailed archive of past facility visits</p>
             </div>
         </header>
@@ -71,6 +69,8 @@ $logs = $conn->query("SELECT *, TIMESTAMPDIFF(SECOND, actual_checkin, actual_che
                 <thead>
                     <tr class="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 uppercase text-[10px] font-black tracking-widest text-slate-400">
                         <th class="p-6">Visitor Details</th>
+                        <th class="p-6">Dest. Info</th>
+                        <th class="p-6">Vehicle Logs</th>
                         <th class="p-6">Status</th>
                         <th class="p-6">Logged Date</th>
                         <th class="p-6">Check-In / Out</th>
@@ -82,12 +82,24 @@ $logs = $conn->query("SELECT *, TIMESTAMPDIFF(SECOND, actual_checkin, actual_che
                     <tr class="hover:bg-slate-50/80 dark:hover:bg-blue-900/10 transition-colors">
                         <td class="p-6">
                             <div class="font-black text-slate-800 dark:text-slate-100 text-lg tracking-tight font-style-normal italic"><?php echo htmlspecialchars($r['full_name']); ?></div>
-                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-style-normal opacity-60 italic">ID: <?php echo $r['tracking_id']; ?></div>
+                            <div class="text-[11px] font-bold text-slate-500 font-style-normal mt-0.5">ID: <?php echo htmlspecialchars($r['national_id']); ?> | Mob: <?php echo htmlspecialchars($r['phone']); ?></div>
+                            <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-style-normal opacity-60 italic mt-0.5">Track ID: <?php echo $r['tracking_id']; ?></div>
                         </td>
                         <td class="p-6">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-style-normal <?php echo $r['status']=='expired' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>"><?php echo $r['status']; ?></span>
+                            <div class="text-xs font-bold text-slate-700 dark:text-slate-300">Host: <span class="font-black text-blue-600 dark:text-blue-400"><?php echo htmlspecialchars($r['host_name']); ?></span></div>
+                            <div class="text-[11px] text-slate-400 font-medium mt-0.5">Purpose: <?php echo htmlspecialchars($r['purpose']); ?></div>
                         </td>
-                        <td class="p-6 text-[10px] font-bold text-slate-300 dark:text-slate-500 italic uppercase font-style-normal">
+                        <td class="p-6">
+                            <?php if(!empty($r['vehicle_details'])): ?>
+                                <span class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border dark:border-slate-700 block text-center"><?php echo htmlspecialchars($r['vehicle_details']); ?></span>
+                            <?php else: ?>
+                                <span class="text-slate-300 dark:text-slate-600 text-xs italic">No Vehicle</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-style-normal <?php echo $r['status']=='expired' ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'; ?>"><?php echo $r['status'] == 'expired' ? 'Completed' : $r['status']; ?></span>
+                        </td>
+                        <td class="p-6 text-[10px] font-bold text-slate-400 dark:text-slate-500 italic uppercase font-style-normal">
                             <?php echo date('M d, Y', strtotime($r['created_at'])); ?>
                         </td>
                         <td class="p-6">
@@ -118,7 +130,7 @@ $logs = $conn->query("SELECT *, TIMESTAMPDIFF(SECOND, actual_checkin, actual_che
                                     </div>
                                 </div>
                             <?php else: ?>
-                                <span class="text-slate-200 font-bold font-style-normal">—</span>
+                                <span class="text-slate-200 dark:text-slate-700 font-bold font-style-normal">—</span>
                             <?php endif; ?>
                         </td>
                     </tr>

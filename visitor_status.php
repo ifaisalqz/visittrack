@@ -7,8 +7,6 @@ $v = $stmt->fetch();
 if (!$v) { header("Location: index.php?error=notfound"); exit(); }
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,11 +32,11 @@ if (!$v) { header("Location: index.php?error=notfound"); exit(); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex items-center justify-center p-6">
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex items-center justify-center p-6 transition-colors duration-300">
 
     <div class="w-full max-w-md">
         <div class="flex justify-between items-center mb-6">
-            <a href="index.php" class="text-slate-400 font-bold text-sm hover:text-blue-600 transition-all">Back to Registration</a>
+            <a href="index.php" class="text-slate-400 font-bold text-sm hover:text-blue-600 transition-all">Back to Home</a>
             <button onclick="toggleDarkMode()" class="text-xs font-black uppercase text-slate-400">🌓 Mode</button>
         </div>
 
@@ -52,19 +50,26 @@ if (!$v) { header("Location: index.php?error=notfound"); exit(); }
             </div>
 
             <div class="p-10 text-center">
+                <div class="mb-8 flex justify-center">
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 inline-block">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=<?php echo urlencode($tid); ?>" alt="QR Pass" class="w-32 h-32">
+                    </div>
+                </div>
+
                 <div class="mb-8">
                     <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Visitor Name</p>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight"><?php echo htmlspecialchars($v['full_name']); ?></h3>
+                    <p class="text-sm font-bold text-slate-500 mt-2">Host: <span class="text-blue-500"><?php echo htmlspecialchars($v['host_name'] ?? 'N/A'); ?></span></p>
                 </div>
 
                 <div class="p-8 rounded-[2.5rem] mb-8 border-2 <?php 
-                    if ($v['status'] == 'approved') echo 'bg-green-50 border-green-100 text-green-600 dark:bg-green-900/20';
-                    elseif ($v['status'] == 'pending') echo 'bg-blue-50 border-blue-100 text-blue-600 status-pulse dark:bg-blue-900/20';
-                    elseif ($v['status'] == 'rejected') echo 'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/20';
-                    else echo 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-slate-800';
+                    if ($v['status'] == 'approved') echo 'bg-green-50 border-green-100 text-green-600 dark:bg-green-900/20 dark:border-green-800';
+                    elseif ($v['status'] == 'pending') echo 'bg-blue-50 border-blue-100 text-blue-600 status-pulse dark:bg-blue-900/20 dark:border-blue-800';
+                    elseif ($v['status'] == 'rejected') echo 'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/20 dark:border-red-800';
+                    else echo 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-slate-800 dark:border-slate-700';
                 ?>">
-                    <span class="text-[10px] uppercase font-black tracking-widest block mb-2 opacity-70">Status</span>
-                    <p class="text-4xl font-black uppercase tracking-tighter"><?php echo ($v['status'] == 'approved') ? 'Checked-In' : $v['status']; ?></p>
+                    <span class="text-[10px] uppercase font-black tracking-widest block mb-2 opacity-70">Security Status</span>
+                    <p class="text-4xl font-black uppercase tracking-tighter"><?php echo ($v['status'] == 'approved') ? 'Approved' : $v['status']; ?></p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-8">

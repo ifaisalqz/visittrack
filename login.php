@@ -1,16 +1,12 @@
 <?php
 session_start();
 
-// eeee
-
-// إذا كان الأدمن مسجل دخوله بالفعل، انقله مباشرة للوحة التحكم
 if (isset($_SESSION['admin']) && $_SESSION['admin'] === true) {
     header("Location: admin/index.php");
     exit();
 }
 
 include 'includes/db.php';
-
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -47,18 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script>
-        // إعدادات الوضع الليلي لتكون متوافقة مع باقي الصفحات
         tailwind.config = { darkMode: 'class' }
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark')
         }
     </script>
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            transition: background-color 0.3s ease;
-        }
-        h1, p, label, button, input { font-style: normal !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; }
+        h1, p, label, button, input, a { font-style: normal !important; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 flex items-center justify-center min-h-screen p-6 transition-colors duration-300">
@@ -86,12 +78,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div>
                 <label class="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-2 ml-1 tracking-widest">Username</label>
                 <input type="text" name="username" required autocomplete="off"
-                class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-600 rounded-2xl outline-none transition-all dark:text-white font-bold" placeholder="Enter username">
+                class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-600 rounded-2xl outline-none transition-all dark:text-white font-bold text-sm shadow-sm" placeholder="Enter username">
             </div>
             <div>
                 <label class="block text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-2 ml-1 tracking-widest">Password</label>
                 <input type="password" name="password" required 
-                class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-600 rounded-2xl outline-none transition-all dark:text-white font-bold" placeholder="••••••••">
+                class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-600 rounded-2xl outline-none transition-all dark:text-white font-bold text-sm shadow-sm" placeholder="••••••••">
             </div>
             <button type="submit" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] uppercase tracking-widest text-xs">
                 Sign In
