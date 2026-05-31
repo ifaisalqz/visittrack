@@ -100,14 +100,14 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
         function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
         
         function autoFillVisitor() {
-            document.querySelector('input[name="name"]').value = 'Fahad Abdullah';
-            document.querySelector('input[name="national_id"]').value = '1098765432';
-            document.querySelector('input[name="phone"]').value = '0501234567';
-            document.querySelector('input[name="email"]').value = 'fahad@example.com';
-            document.querySelector('input[name="host_name"]').value = 'Mohamed Sabry';
-            document.querySelector('input[name="purpose"]').value = 'Server Maintenance';
+            document.querySelector('input[name="name"]').value = 'Faisal Alzahrani';
+            document.querySelector('input[name="national_id"]').value = '11111111';
+            document.querySelector('input[name="phone"]').value = '0551524456';
+            document.querySelector('input[name="email"]').value = 'ifaisalqz@gmail.com';
+            document.querySelector('input[name="host_name"]').value = 'Sultan Al-Omran';
+            document.querySelector('input[name="purpose"]').value = 'Interview';
             document.querySelector('input[name="car_model"]').value = '2024 Changan Eado Plus';
-            document.querySelector('input[name="plate_number"]').value = 'ABC 1234';
+            document.querySelector('input[name="plate_number"]').value = 'AKR 6515';
             document.querySelector('input[name="arrival"]').value = '08:00';
             document.querySelector('input[name="departure"]').value = '15:00';
         }

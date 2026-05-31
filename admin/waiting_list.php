@@ -7,7 +7,6 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
 include '../includes/db.php';
 include '../includes/mailer.php';
 
-// دالة مساعدة لإرسال إيميل تسجيل الدخول أو الخروج
 function sendCheckEmail($toEmail, $toName, $tid, $type, $checkin = null, $checkout = null) {
     $safeName = htmlspecialchars($toName);
     $safeTid  = htmlspecialchars($tid);
@@ -24,7 +23,6 @@ function sendCheckEmail($toEmail, $toName, $tid, $type, $checkin = null, $checko
             <h3 style="color: #1e293b; font-size: 20px; letter-spacing: 2px; margin-top: 0;">' . $safeTid . '</h3>
         </div>';
     } else {
-        // حساب مدة الزيارة
         $duration = '';
         if (!empty($checkin) && !empty($checkout)) {
             $secs = strtotime($checkout) - strtotime($checkin);
@@ -51,7 +49,6 @@ function sendCheckEmail($toEmail, $toName, $tid, $type, $checkin = null, $checko
 }
 
 if (isset($_GET['op']) && isset($_GET['id'])) {
-    // نقرأ بيانات الزائر قبل التحديث
     $stmt = $conn->prepare("SELECT email, full_name, tracking_id, actual_checkin FROM visitors WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $v = $stmt->fetch();
@@ -60,16 +57,16 @@ if (isset($_GET['op']) && isset($_GET['id'])) {
         $now = date('Y-m-d H:i:s');
 
         if ($_GET['op'] == 'checkin') {
-            // فقط من لم يسجل دخوله بعد
-            $upd = $conn->prepare("UPDATE visitors SET actual_checkin = ? WHERE id = ? AND status = 'approved' AND actual_checkin IS NULL");
+            // الحارس: لم يسجل دخول بعد — بغض النظر عن الـ status
+            $upd = $conn->prepare("UPDATE visitors SET actual_checkin = ? WHERE id = ? AND actual_checkin IS NULL");
             $upd->execute([$now, $_GET['id']]);
             if ($upd->rowCount() > 0) {
                 @sendCheckEmail($v['email'], $v['full_name'], $v['tracking_id'], 'checkin', $now);
             }
 
         } elseif ($_GET['op'] == 'checkout') {
-            // فقط من سجل دخوله ولم يسجل خروجه بعد
-            $upd = $conn->prepare("UPDATE visitors SET actual_checkout = ?, status = 'completed' WHERE id = ? AND status = 'approved' AND actual_checkin IS NOT NULL AND actual_checkout IS NULL");
+            // الحارس: سجل دخول ولم يسجل خروج — بغض النظر عن الـ status
+            $upd = $conn->prepare("UPDATE visitors SET actual_checkout = ?, status = 'completed' WHERE id = ? AND actual_checkin IS NOT NULL AND actual_checkout IS NULL");
             $upd->execute([$now, $_GET['id']]);
             if ($upd->rowCount() > 0) {
                 @sendCheckEmail($v['email'], $v['full_name'], $v['tracking_id'], 'checkout', $v['actual_checkin'], $now);
@@ -81,8 +78,22 @@ if (isset($_GET['op']) && isset($_GET['id'])) {
     exit();
 }
 
-$waiting = $conn->query("SELECT * FROM visitors WHERE status = 'approved' AND actual_checkin IS NULL ORDER BY arrival_time ASC")->fetchAll();
-$active  = $conn->query("SELECT * FROM visitors WHERE status = 'approved' AND actual_checkin IS NOT NULL AND actual_checkout IS NULL ORDER BY actual_checkin DESC")->fetchAll();
+// Expected: لم يدخل بعد (بغض النظر عن الـ status — المهم actual_checkin فارغ)
+$waiting = $conn->query("
+    SELECT * FROM visitors 
+    WHERE actual_checkin IS NULL 
+      AND status NOT IN ('rejected', 'expired', 'completed')
+    ORDER BY arrival_time ASC
+")->fetchAll();
+
+// Currently inside: دخل ولم يخرج بعد
+$active = $conn->query("
+    SELECT * FROM visitors 
+    WHERE actual_checkin IS NOT NULL 
+      AND actual_checkout IS NULL
+      AND status NOT IN ('rejected', 'expired', 'completed')
+    ORDER BY actual_checkin DESC
+")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
