@@ -8,16 +8,20 @@ include '../includes/db.php';
 
 if (isset($_GET['op']) && isset($_GET['id'])) {
     if ($_GET['op'] == 'checkin') {
-        $conn->prepare("UPDATE visitors SET actual_checkin = NOW() WHERE id = ?")->execute([$_GET['id']]);
+        // ينتقل من approved إلى active فقط — يمنع تسجيل دخول مزدوج
+        $conn->prepare("UPDATE visitors SET actual_checkin = NOW(), status = 'active' WHERE id = ? AND status = 'approved'")
+             ->execute([$_GET['id']]);
     } elseif ($_GET['op'] == 'checkout') {
-        $conn->prepare("UPDATE visitors SET actual_checkout = NOW(), status = 'completed' WHERE id = ?")->execute([$_GET['id']]);
+        // ينتقل من active إلى completed فقط — يمنع تسجيل خروج لمن لم يدخل
+        $conn->prepare("UPDATE visitors SET actual_checkout = NOW(), status = 'completed' WHERE id = ? AND status = 'active'")
+             ->execute([$_GET['id']]);
     }
     header("Location: waiting_list.php"); 
     exit();
 }
 
 $waiting = $conn->query("SELECT * FROM visitors WHERE status = 'approved' AND actual_checkin IS NULL ORDER BY arrival_time ASC")->fetchAll();
-$active = $conn->query("SELECT * FROM visitors WHERE status = 'approved' AND actual_checkin IS NOT NULL AND actual_checkout IS NULL ORDER BY actual_checkin DESC")->fetchAll();
+$active  = $conn->query("SELECT * FROM visitors WHERE status = 'active' AND actual_checkout IS NULL ORDER BY actual_checkin DESC")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">

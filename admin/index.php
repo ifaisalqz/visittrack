@@ -7,6 +7,49 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
 include '../includes/db.php';
 include '../includes/mailer.php'; // استدعاء ملف الإيميل
 
+// دالة مساعدة لبناء وإرسال الإيميل حسب حالة الطلب
+function sendVisitorEmail($toEmail, $toName, $tid, $status, $arrival = null, $departure = null) {
+    $safeName = htmlspecialchars($toName);
+    $safeTid  = htmlspecialchars($tid);
+
+    if ($status === 'approved') {
+        $subject = 'Your Visit Request Has Been Approved - Visit Track';
+
+        $timeLine = '';
+        if (!empty($arrival) && !empty($departure)) {
+            $timeLine = '<p style="color: #94a3b8; font-size: 12px;">Planned Visit: '
+                . date('h:i A', strtotime($arrival)) . ' to '
+                . date('h:i A', strtotime($departure)) . '</p>';
+        }
+
+        $body = '
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 15px; text-align: center; background-color: #f8fafc;">
+            <h2 style="color: #16a34a;">Visit Approved!</h2>
+            <p style="color: #64748b; font-size: 16px;">Dear <strong>' . $safeName . '</strong>,</p>
+            <p style="color: #64748b; font-size: 16px;">Your visit request has been approved. Please present the QR code below to security at the gate.</p>
+            <div style="background: white; padding: 15px; border-radius: 10px; display: inline-block; margin: 20px 0;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($tid) . '" alt="QR Code">
+            </div>
+            <p style="font-size: 14px; color: #94a3b8; text-transform: uppercase;">Tracking ID</p>
+            <h3 style="color: #1e293b; font-size: 24px; letter-spacing: 2px; margin-top: 0;">' . $safeTid . '</h3>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+            ' . $timeLine . '
+        </div>';
+    } else {
+        $subject = 'Visit Request Update - Visit Track';
+        $body = '
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 15px; text-align: center; background-color: #f8fafc;">
+            <h2 style="color: #dc2626;">Visit Request Not Approved</h2>
+            <p style="color: #64748b; font-size: 16px;">Dear <strong>' . $safeName . '</strong>,</p>
+            <p style="color: #64748b; font-size: 16px;">We regret to inform you that your visit request was not approved at this time. Please contact your host for more information.</p>
+            <p style="font-size: 14px; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Reference ID</p>
+            <h3 style="color: #1e293b; font-size: 20px; letter-spacing: 2px; margin-top: 0;">' . $safeTid . '</h3>
+        </div>';
+    }
+
+    return sendVisitEmail($toEmail, $toName, $subject, $body);
+}
+
 // إضافة Walk-in وإرسال إيميل
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_visitor'])) {
     $tid = "ADM-" . strtoupper(substr(bin2hex(random_bytes(3)), 0, 5));
@@ -18,11 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_visitor'])) {
         $_POST['purpose'], $vehicle_details, $_POST['arrival'], $_POST['departure'], $tid
     ]);
     
-    // محاولة إرسال الإيميل بصمت عشان ما يوقف الكود
-    if(function_exists('sendVisitorEmail')) {
-        @sendVisitorEmail($_POST['email'], $_POST['name'], $tid, 'approved');
-    }
-    header("Location: index.php?success=1"); 
+    // إرسال الإيميل بصمت — في حال فشل SMTP ما يوقف الكود
+    @sendVisitorEmail($_POST['email'], $_POST['name'], $tid, 'approved', $_POST['arrival'], $_POST['departure']);
+
+    header("Location: waiting_list.php"); 
     exit();
 }
 
@@ -30,15 +72,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_visitor'])) {
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $status = ($_GET['action'] == 'approve') ? 'approved' : 'rejected';
     
-    $stmt = $conn->prepare("SELECT email, full_name, tracking_id FROM visitors WHERE id = ?");
+    $stmt = $conn->prepare("SELECT email, full_name, tracking_id, arrival_time, departure_time FROM visitors WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $v = $stmt->fetch();
     
     if ($v) {
         $conn->prepare("UPDATE visitors SET status = ? WHERE id = ?")->execute([$status, $_GET['id']]);
-        if(function_exists('sendVisitorEmail')) {
-            @sendVisitorEmail($v['email'], $v['full_name'], $v['tracking_id'], $status);
-        }
+        @sendVisitorEmail($v['email'], $v['full_name'], $v['tracking_id'], $status, $v['arrival_time'], $v['departure_time']);
     }
     header("Location: index.php"); 
     exit();
