@@ -16,32 +16,41 @@ if (isset($_GET['tid'])) {
 
 // إعداد ألوان ونصوص الحالة
 $statusColor = 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20';
-$statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-$statusText = 'Pending Approval';
+$statusIcon  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+$statusText  = 'Pending';
 
 if ($visitor) {
-    switch ($visitor['status']) {
-        case 'approved':
-            $statusColor = 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-500/20';
-            $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-            $statusText = 'Approved & Ready';
-            break;
-        case 'active':
-            $statusColor = 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
-            $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>';
-            $statusText = 'Currently Inside';
-            break;
-        case 'rejected':
-            $statusColor = 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20';
-            $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-            $statusText = 'Request Rejected';
-            break;
-        case 'expired':
-        case 'completed':
-            $statusColor = 'bg-slate-100 dark:bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-500/20';
-            $statusIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
-            $statusText = 'Visit Completed';
-            break;
+    $hasCheckin  = !empty($visitor['actual_checkin']);
+    $hasCheckout = !empty($visitor['actual_checkout']);
+
+    if ($visitor['status'] === 'rejected') {
+        $statusColor = 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20';
+        $statusIcon  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        $statusText  = 'Rejected';
+
+    } elseif ($visitor['status'] === 'expired') {
+        $statusColor = 'bg-orange-50 dark:bg-orange-500/10 text-orange-500 dark:text-orange-400 border-orange-200 dark:border-orange-500/20';
+        $statusIcon  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        $statusText  = 'Expired';
+
+    } elseif ($visitor['status'] === 'completed' || $hasCheckout) {
+        $statusColor = 'bg-slate-100 dark:bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-500/20';
+        $statusIcon  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>';
+        $statusText  = 'Checked Out';
+
+    } elseif ($hasCheckin) {
+        $statusColor = 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
+        $statusIcon  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>';
+        $statusText  = 'Checked In';
+
+    } elseif ($visitor['status'] === 'approved') {
+        $statusColor = 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-500/20';
+        $statusIcon  = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        $statusText  = 'Approved';
+
+    } else {
+        // pending (default)
+        $statusText = 'Pending';
     }
 }
 ?>
@@ -59,6 +68,7 @@ if ($visitor) {
         function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
     </script>
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s; } .font-style-normal { font-style: normal !important; }</style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body class="bg-slate-50 dark:bg-[#0B1120] min-h-screen flex flex-col transition-colors duration-300 selection:bg-blue-500 selection:text-white">
 
@@ -100,20 +110,20 @@ if ($visitor) {
                 </div>
 
                 <div class="p-8 text-center bg-slate-50/50 dark:bg-[#0B1120]/30">
-                    <?php if ($visitor['status'] == 'approved' || $visitor['status'] == 'active'): ?>
+                    <?php if ($visitor['status'] == 'approved' || $visitor['status'] == 'active' || $visitor['status'] == 'pending'): ?>
                         <div class="bg-white p-4 rounded-3xl shadow-sm inline-block border border-slate-100 dark:border-slate-700">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<?php echo urlencode($visitor['tracking_id']); ?>&color=0f172a" class="rounded-xl w-40 h-40" alt="QR Code">
+                            <div id="qr-active" class="rounded-xl w-40 h-40 flex items-center justify-center"></div>
                         </div>
                         <p class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tracking ID</p>
                         <p class="text-xl font-black text-slate-800 dark:text-white tracking-[0.2em] mt-1 uppercase font-mono"><?php echo htmlspecialchars($visitor['tracking_id']); ?></p>
                     <?php elseif ($visitor['status'] == 'expired' || $visitor['status'] == 'completed'): ?>
                         <div class="bg-white p-4 rounded-3xl shadow-sm inline-block border border-slate-100 dark:border-slate-700 opacity-40 grayscale">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<?php echo urlencode($visitor['tracking_id']); ?>&color=0f172a" class="rounded-xl w-40 h-40" alt="QR Code">
+                            <div id="qr-archived" class="rounded-xl w-40 h-40 flex items-center justify-center"></div>
                         </div>
                         <p class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Archived Pass</p>
                     <?php else: ?>
-                        <div class="w-32 h-32 bg-slate-100 dark:bg-slate-800/50 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-slate-700/50">
-                            <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <div class="w-40 h-40 bg-slate-100 dark:bg-slate-800/50 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-slate-700/50">
+                            <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tracking ID</p>
                         <p class="text-lg font-black text-slate-600 dark:text-slate-400 tracking-[0.2em] mt-1 uppercase font-mono"><?php echo htmlspecialchars($visitor['tracking_id']); ?></p>
@@ -148,5 +158,15 @@ if ($visitor) {
             .shadow-2xl { box-shadow: none !important; border: 2px solid #e2e8f0; }
         }
     </style>
+    <script>
+        const tid = <?php echo json_encode($visitor['tracking_id'] ?? ''); ?>;
+        const qrOptions = { width: 160, height: 160, colorDark: '#0f172a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H };
+
+        const elActive   = document.getElementById('qr-active');
+        const elArchived = document.getElementById('qr-archived');
+
+        if (elActive   && tid) new QRCode(elActive,   Object.assign({ text: tid }, qrOptions));
+        if (elArchived && tid) new QRCode(elArchived, Object.assign({ text: tid }, qrOptions));
+    </script>
 </body>
 </html>

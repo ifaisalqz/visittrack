@@ -6,6 +6,7 @@
     <title>Visit Track - Registration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { darkMode: 'class' }
@@ -135,14 +136,24 @@
             Swal.fire({
                 title: 'Registration Successful!',
                 html: `<div class="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-2xl my-4 text-center border border-blue-100 dark:border-blue-500/20">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${tid}" class="mx-auto rounded-xl mb-4 shadow-sm" alt="QR Code">
+                        <div id="swal-qr" class="flex justify-center mb-4"></div>
                         <p class="text-[10px] font-black uppercase text-blue-500 dark:text-blue-400 mb-1 tracking-widest">Tracking ID</p>
                         <h2 class="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-widest font-mono">${tid}</h2>
                        </div>`,
                 icon: 'success',
                 confirmButtonColor: '#2563eb',
                 background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#fff',
-                color: document.documentElement.classList.contains('dark') ? '#fff' : '#0f172a'
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#0f172a',
+                didOpen: () => {
+                    new QRCode(document.getElementById('swal-qr'), {
+                        text: tid,
+                        width: 150,
+                        height: 150,
+                        colorDark: '#0f172a',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
             }).then(() => { window.location.href = 'visitor_status.php?tid=' + tid; });
         }
     </script>

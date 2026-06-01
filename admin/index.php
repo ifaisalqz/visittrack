@@ -80,8 +80,17 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
             document.querySelector('input[name="arrival"]').value = '08:00';
             document.querySelector('input[name="departure"]').value = '15:00';
         }
+
+        function toggleDetails(btn) {
+            const panel = btn.parentElement.querySelector('.details-panel');
+            const arrow  = btn.querySelector('.arrow');
+            const isOpen = !panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', isOpen);
+            arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+            btn.querySelector('.btn-label').textContent = isOpen ? 'Show details' : 'Hide details';
+        }
     </script>
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s; } .font-style-normal { font-style: normal !important; }</style>
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s; } .font-style-normal { font-style: normal !important; } .arrow { transition: transform 0.2s ease; }</style>
 </head>
 <body class="bg-slate-50 dark:bg-[#0B1120] flex min-h-screen text-slate-800 dark:text-slate-300 transition-colors duration-300 selection:bg-blue-500 selection:text-white overflow-x-hidden">
 
@@ -97,27 +106,74 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
         </header>
 
         <div class="bg-white dark:bg-slate-900/60 backdrop-blur-2xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800/80 shadow-xl dark:shadow-2xl overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700/50">
-                        <tr class="uppercase text-[10px] font-black tracking-widest text-slate-500 dark:text-slate-400"><th class="p-6">Visitor Details</th><th class="p-6">Purpose</th><th class="p-6">Time</th><th class="p-6 text-center">Actions</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
-                        <?php if(count($active) > 0): foreach($active as $r): ?>
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-                            <td class="p-6"><div class="font-black text-slate-800 dark:text-white text-lg mb-1"><?php echo htmlspecialchars($r['full_name']); ?></div><div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">ID: <?php echo htmlspecialchars($r['national_id']); ?></div></td>
-                            <td class="p-6"><div class="text-sm font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['purpose']); ?></div><div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Host: <?php echo htmlspecialchars($r['host_name']); ?></div></td>
-                            <td class="p-6 text-sm font-black text-blue-600 dark:text-blue-400"><?php echo date('h:i A', strtotime($r['arrival_time'])); ?></td>
-                            <td class="p-6 flex justify-center gap-3">
-                                <a href="?action=approve&id=<?php echo $r['id']; ?>" class="px-5 py-2.5 bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 hover:bg-green-600 hover:text-white border border-green-200 dark:border-green-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Approve</a>
-                                <a href="?action=rejected&id=<?php echo $r['id']; ?>" class="px-5 py-2.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Reject</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; else: ?>
-                        <tr><td colspan="4" class="p-12 text-center text-slate-500"><p class="text-sm font-bold uppercase tracking-widest">No pending requests</p></td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+            <div class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                <?php if(count($active) > 0): foreach($active as $r): ?>
+                <div class="p-6 hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+                    <div class="flex items-start justify-between gap-4">
+
+                        <!-- QR on the left -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=<?php echo urlencode($r['tracking_id']); ?>&color=0f172a"
+                             class="flex-shrink-0 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-1.5" width="90" height="90" alt="QR">
+
+                        <div class="flex-1 min-w-0">
+                            <!-- Basic: always visible -->
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="font-black text-slate-800 dark:text-white text-base"><?php echo htmlspecialchars($r['full_name']); ?></span>
+                                <span class="text-[9px] font-black font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-lg border border-blue-100 dark:border-blue-500/20"><?php echo htmlspecialchars($r['tracking_id']); ?></span>
+                            </div>
+                            <p class="text-xs font-black text-blue-600 dark:text-blue-400 mb-3">
+                                <?php echo date('h:i A', strtotime($r['arrival_time'])); ?>
+                                <span class="text-slate-400 mx-1">→</span>
+                                <?php echo date('h:i A', strtotime($r['departure_time'])); ?>
+                            </p>
+
+                            <!-- Toggle button -->
+                            <button onclick="toggleDetails(this)" class="flex items-center gap-1.5 text-[9px] font-black text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 uppercase tracking-widest transition-colors">
+                                <svg class="arrow w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+                                <span class="btn-label">Show details</span>
+                            </button>
+
+                            <!-- Expandable details -->
+                            <div class="details-panel hidden mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-x-6 gap-y-3">
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">National ID</p>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['national_id']); ?></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Phone</p>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['phone']); ?></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Host</p>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['host_name']); ?></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Purpose</p>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['purpose']); ?></p>
+                                </div>
+                                <?php if (!empty($r['vehicle_details'])): ?>
+                                <div class="col-span-2">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Vehicle</p>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['vehicle_details']); ?></p>
+                                </div>
+                                <?php endif; ?>
+                                <div class="col-span-2">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Email</p>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300"><?php echo htmlspecialchars($r['email']); ?></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Approve / Reject buttons -->
+                        <div class="flex-shrink-0 flex flex-col gap-2">
+                            <a href="?action=approve&id=<?php echo $r['id']; ?>" class="px-5 py-2.5 bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 hover:bg-green-600 hover:text-white border border-green-200 dark:border-green-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center">Approve</a>
+                            <a href="?action=rejected&id=<?php echo $r['id']; ?>" class="px-5 py-2.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center">Reject</a>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; else: ?>
+                <div class="p-12 text-center text-slate-500"><p class="text-sm font-bold uppercase tracking-widest">No pending requests</p></div>
+                <?php endif; ?>
             </div>
         </div>
     </main>
