@@ -92,8 +92,16 @@ function formatDuration($checkin, $checkout) {
 
                             <!-- Visitor & Date -->
                             <td class="p-6">
-                                <div class="font-black text-slate-800 dark:text-white text-base mb-1"><?php echo htmlspecialchars($l['full_name']); ?></div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"><?php echo date('M d, Y', strtotime($l['created_at'])); ?></div>
+                                <div class="flex items-start gap-4">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=<?php echo urlencode($l['tracking_id']); ?>&color=0f172a"
+                                         class="rounded-xl border border-slate-200 dark:border-slate-700 flex-shrink-0 bg-white p-1"
+                                         width="72" height="72" alt="QR">
+                                    <div>
+                                        <div class="font-black text-slate-800 dark:text-white text-base mb-1"><?php echo htmlspecialchars($l['full_name']); ?></div>
+                                        <div class="text-[10px] font-black font-mono text-blue-600 dark:text-blue-400 tracking-widest mb-1"><?php echo htmlspecialchars($l['tracking_id']); ?></div>
+                                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"><?php echo date('M d, Y', strtotime($l['created_at'])); ?></div>
+                                    </div>
+                                </div>
                             </td>
 
                             <!-- Visit Details -->

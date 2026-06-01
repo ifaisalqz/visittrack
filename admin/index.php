@@ -7,47 +7,16 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
 include '../includes/db.php';
 include '../includes/mailer.php'; // استدعاء ملف الإيميل
 
-// دالة مساعدة لبناء وإرسال الإيميل حسب حالة الطلب
+// دالة مساعدة لإرسال الإيميل حسب حالة الطلب
 function sendVisitorEmail($toEmail, $toName, $tid, $status, $arrival = null, $departure = null) {
-    $safeName = htmlspecialchars($toName);
-    $safeTid  = htmlspecialchars($tid);
-
-    if ($status === 'approved') {
-        $subject = 'Your Visit Request Has Been Approved - Visit Track';
-
-        $timeLine = '';
-        if (!empty($arrival) && !empty($departure)) {
-            $timeLine = '<p style="color: #94a3b8; font-size: 12px;">Planned Visit: '
-                . date('h:i A', strtotime($arrival)) . ' to '
-                . date('h:i A', strtotime($departure)) . '</p>';
-        }
-
-        $body = '
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 15px; text-align: center; background-color: #f8fafc;">
-            <h2 style="color: #16a34a;">Visit Approved!</h2>
-            <p style="color: #64748b; font-size: 16px;">Dear <strong>' . $safeName . '</strong>,</p>
-            <p style="color: #64748b; font-size: 16px;">Your visit request has been approved. Please present the QR code below to security at the gate.</p>
-            <div style="background: white; padding: 15px; border-radius: 10px; display: inline-block; margin: 20px 0;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($tid) . '" alt="QR Code">
-            </div>
-            <p style="font-size: 14px; color: #94a3b8; text-transform: uppercase;">Tracking ID</p>
-            <h3 style="color: #1e293b; font-size: 24px; letter-spacing: 2px; margin-top: 0;">' . $safeTid . '</h3>
-            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-            ' . $timeLine . '
-        </div>';
-    } else {
-        $subject = 'Visit Request Update - Visit Track';
-        $body = '
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 15px; text-align: center; background-color: #f8fafc;">
-            <h2 style="color: #dc2626;">Visit Request Not Approved</h2>
-            <p style="color: #64748b; font-size: 16px;">Dear <strong>' . $safeName . '</strong>,</p>
-            <p style="color: #64748b; font-size: 16px;">We regret to inform you that your visit request was not approved at this time. Please contact your host for more information.</p>
-            <p style="font-size: 14px; color: #94a3b8; text-transform: uppercase; margin-top: 20px;">Reference ID</p>
-            <h3 style="color: #1e293b; font-size: 20px; letter-spacing: 2px; margin-top: 0;">' . $safeTid . '</h3>
-        </div>';
-    }
-
-    return sendVisitEmail($toEmail, $toName, $subject, $body);
+    $type = ($status === 'approved') ? 'approved' : 'rejected';
+    $email = buildEmailHtml($type, [
+        'name'      => $toName,
+        'tid'       => $tid,
+        'arrival'   => $arrival,
+        'departure' => $departure,
+    ]);
+    return sendVisitEmail($toEmail, $toName, $email['subject'], $email['html']);
 }
 
 // إضافة Walk-in وإرسال إيميل
@@ -100,14 +69,14 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
         function toggleDarkMode() { document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
         
         function autoFillVisitor() {
-            document.querySelector('input[name="name"]').value = 'Faisal Alzahrani';
-            document.querySelector('input[name="national_id"]').value = '11111111';
-            document.querySelector('input[name="phone"]').value = '0551524456';
-            document.querySelector('input[name="email"]').value = 'ifaisalqz@gmail.com';
-            document.querySelector('input[name="host_name"]').value = 'Sultan Al-Omran';
-            document.querySelector('input[name="purpose"]').value = 'Interview';
+            document.querySelector('input[name="name"]').value = 'Fahad Abdullah';
+            document.querySelector('input[name="national_id"]').value = '1098765432';
+            document.querySelector('input[name="phone"]').value = '0501234567';
+            document.querySelector('input[name="email"]').value = 'fahad@example.com';
+            document.querySelector('input[name="host_name"]').value = 'Mohamed Sabry';
+            document.querySelector('input[name="purpose"]').value = 'Server Maintenance';
             document.querySelector('input[name="car_model"]').value = '2024 Changan Eado Plus';
-            document.querySelector('input[name="plate_number"]').value = 'AKR 6515';
+            document.querySelector('input[name="plate_number"]').value = 'ABC 1234';
             document.querySelector('input[name="arrival"]').value = '08:00';
             document.querySelector('input[name="departure"]').value = '15:00';
         }
