@@ -21,6 +21,7 @@ $adminName = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <a href="waiting_list.php" class="flex items-center gap-4 p-4 <?php echo ($currentPage == 'waiting_list.php') ? 'bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-600/30 font-black font-style-normal' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-2xl transition-all font-bold font-style-normal hover:translate-x-1'; ?>">
             Waiting & Active
         </a>
+        <a href="stats.php" class="flex items-center gap-4 p-4 <?php echo ($currentPage == 'stats.php') ? 'bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-600/30 font-black font-style-normal' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-2xl transition-all font-bold font-style-normal hover:translate-x-1'; ?>">Statistics</a>
         <a href="logs.php" class="flex items-center gap-4 p-4 <?php echo ($currentPage == 'logs.php') ? 'bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-600/30 font-black font-style-normal' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-2xl transition-all font-bold font-style-normal hover:translate-x-1'; ?>">
             History Logs
         </a>
@@ -44,6 +45,10 @@ $adminName = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
                 Toggle Theme
             </span>
         </button>
+        <a href="change_password.php" class="flex items-center gap-3 w-full p-4 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-white rounded-2xl transition-all font-black uppercase text-[10px] tracking-widest font-style-normal <?php echo ($currentPage == 'change_password.php') ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-800 dark:text-white' : ''; ?>">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+            Change Password
+        </a>
         <a href="../admin/logout.php" class="flex items-center justify-center w-full p-4 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all font-black uppercase text-[10px] border border-red-100 dark:border-red-500/20 tracking-widest font-style-normal">
             Logout
         </a>

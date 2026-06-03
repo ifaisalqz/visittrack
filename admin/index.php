@@ -21,18 +21,41 @@ function sendVisitorEmail($toEmail, $toName, $tid, $status, $arrival = null, $de
 
 // إضافة Walk-in وإرسال إيميل
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_visitor'])) {
+
+    // ── التحقق من يوم العمل ──
+    $phpDay = (int)date('w', strtotime($visit_date));
+    if ($phpDay === 5 || $phpDay === 6) {
+        $_SESSION['walkin_error'] = 'يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس';
+        header("Location: index.php"); exit();
+    }
+
+    // ── التحقق من ساعات الدوام ──
+    $toMins = fn($t) => (int)explode(':',$t)[0]*60 + (int)explode(':',$t)[1];
+    $OPEN   = 7*60;
+    $CLOSE  = 15*60 + 30;
+
+    $walkinError = null;
+    if ($toMins($_POST['arrival']) < $OPEN || $toMins($_POST['arrival']) > $CLOSE) {
+        $walkinError = 'وقت الوصول خارج ساعات العمل (٧:٠٠ ص — ٣:٣٠ م)';
+    } elseif ($toMins($_POST['departure']) < $OPEN || $toMins($_POST['departure']) > $CLOSE) {
+        $walkinError = 'وقت المغادرة خارج ساعات العمل (٧:٠٠ ص — ٣:٣٠ م)';
+    }
+
+    if ($walkinError) {
+        $_SESSION['walkin_error'] = $walkinError;
+        header("Location: index.php"); exit();
+    }
+
     $tid = "ADM-" . strtoupper(substr(bin2hex(random_bytes(3)), 0, 5));
     $vehicle_details = trim($_POST['car_model'] . ' ' . $_POST['plate_number']);
     
-    $stmt = $conn->prepare("INSERT INTO visitors (full_name, phone, host_name, national_id, email, purpose, vehicle_details, arrival_time, departure_time, tracking_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')");
+    $stmt = $conn->prepare("INSERT INTO visitors (full_name, phone, host_name, national_id, email, purpose, vehicle_details, arrival_time, departure_time, visit_date, tracking_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')");
     $stmt->execute([
         $_POST['name'], $_POST['phone'], $_POST['host_name'], $_POST['national_id'], $_POST['email'],
-        $_POST['purpose'], $vehicle_details, $_POST['arrival'], $_POST['departure'], $tid
+        $_POST['purpose'], $vehicle_details, $_POST['arrival'], $_POST['departure'], $visit_date, $tid
     ]);
     
-    // إرسال الإيميل بصمت — في حال فشل SMTP ما يوقف الكود
     @sendVisitorEmail($_POST['email'], $_POST['name'], $tid, 'approved', $_POST['arrival'], $_POST['departure']);
-
     header("Location: waiting_list.php"); 
     exit();
 }
@@ -53,10 +76,21 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     exit();
 }
 
+// auto-expire: أي طلب معلق أو مقبول وتاريخه مضى
+$conn->exec("UPDATE visitors SET status='expired' WHERE status IN ('pending','approved') AND visit_date < CURDATE()");
+
 $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY created_at DESC")->fetchAll();
+
+// رسالة خطأ Walk-in
+$walkinError = $_SESSION['walkin_error'] ?? null;
+unset($_SESSION['walkin_error']);
+
+// هل الشركة مفتوحة الآن؟
+$nowMins    = (int)date('H')*60 + (int)date('i');
+$isOpen     = $nowMins >= 7*60 && $nowMins <= 15*60+30;
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,6 +138,13 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Add Walk-in
             </button>
         </header>
+
+        <?php if ($walkinError): ?>
+        <div class="mb-6 flex items-center gap-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-2xl px-6 py-4">
+            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-sm font-black text-red-700 dark:text-red-400"><?php echo htmlspecialchars($walkinError); ?></p>
+        </div>
+        <?php endif; ?>
 
         <div class="bg-white dark:bg-slate-900/60 backdrop-blur-2xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800/80 shadow-xl dark:shadow-2xl overflow-hidden">
             <div class="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -202,8 +243,10 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
                         <div class="md:col-span-2 mt-2"><h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-200 dark:border-slate-700/50 pb-2">2. Visit Details</h3></div>
                         <div><label class="block text-[10px] font-black uppercase text-slate-400 mb-2 ml-1">Host Name</label><input type="text" name="host_name" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-bold text-sm"></div>
                         <div><label class="block text-[10px] font-black uppercase text-slate-400 mb-2 ml-1">Purpose of Visit</label><input type="text" name="purpose" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-bold text-sm"></div>
-                        <div><label class="block text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 mb-2 ml-1">Arrival Time</label><input type="time" name="arrival" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-black text-sm"></div>
-                        <div><label class="block text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 mb-2 ml-1">Departure Time</label><input type="time" name="departure" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-black text-sm"></div>
+                        <div><label class="block text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 mb-2 ml-1">Visit Date</label><input type="date" name="visit_date" id="walkinDate" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-black text-sm"></div>
+                        <div></div>
+                        <div><label class="block text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 mb-2 ml-1">Arrival Time</label><input type="time" name="arrival" min="07:00" max="15:30" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-black text-sm"></div>
+                        <div><label class="block text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 mb-2 ml-1">Departure Time</label><input type="time" name="departure" min="07:00" max="15:30" required class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-black text-sm"></div>
 
                         <div class="md:col-span-2 mt-2"><h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest border-b border-slate-200 dark:border-slate-700/50 pb-2">3. Vehicle (Optional)</h3></div>
                         <div><label class="block text-[10px] font-black uppercase text-slate-400 mb-2 ml-1">Car Model</label><input type="text" name="car_model" placeholder="e.g. Changan" class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-slate-800 dark:text-white font-bold text-sm"></div>
@@ -217,4 +260,25 @@ $active = $conn->query("SELECT * FROM visitors WHERE status = 'pending' ORDER BY
         </div>
     </div>
 </body>
+<script>
+// ── Walk-in: تعيين تاريخ اليوم والتحقق من أيام العمل ──
+(function() {
+    const dateInput = document.getElementById('walkinDate');
+    if (!dateInput) return;
+
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    dateInput.min = todayStr;
+    dateInput.value = todayStr;
+
+    dateInput.addEventListener('change', function() {
+        const d   = new Date(this.value + 'T00:00:00');
+        const day = d.getDay(); // 0=Sun ... 4=Thu, 5=Fri, 6=Sat
+        if (day === 5 || day === 6) {
+            alert('يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس');
+            this.value = todayStr;
+        }
+    });
+})();
+</script>
 </html>

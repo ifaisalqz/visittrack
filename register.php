@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,14 +87,21 @@
                             <input type="text" name="purpose" placeholder="Reason for visit" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 outline-none transition-all font-bold dark:text-white shadow-sm text-sm">
                         </div>
                     </div>
+                    <!-- تاريخ الزيارة -->
+                    <div class="space-y-2 mb-6">
+                        <label class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest ml-1 font-style-normal">Visit Date</label>
+                        <input type="date" name="visit_date" id="visitDate" required
+                               class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
+                        <p class="text-[10px] font-bold text-slate-400 ml-1">أيام العمل: الأحد — الخميس فقط</p>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest ml-1 font-style-normal">Arrival Time</label>
-                            <input type="time" name="arrival" min="07:00" max="16:00" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
+                            <input type="time" name="arrival" min="07:00" max="15:30" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest ml-1 font-style-normal">Departure Time</label>
-                            <input type="time" name="departure" min="07:00" max="16:00" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
+                            <input type="time" name="departure" min="07:00" max="15:30" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
                         </div>
                     </div>
                 </div>
@@ -122,7 +129,102 @@
     </main>
 
     <script>
-        document.querySelector('form').addEventListener('submit', function() {
+        // ── إعداد حقل التاريخ: الحد الأدنى اليوم، تعطيل عطل نهاية الأسبوع ──
+        (function setupDateField() {
+            const dateInput = document.getElementById('visitDate');
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            dateInput.min = todayStr;
+
+            // اقترح أقرب يوم عمل (أحد-خميس)
+            function nextWorkday(d) {
+                const day = d.getDay(); // 0=Sun,1=Mon,...,5=Fri,6=Sat
+                if (day === 5) d.setDate(d.getDate() + 2); // جمعة → أحد
+                if (day === 6) d.setDate(d.getDate() + 1); // سبت → أحد
+                return d;
+            }
+            const suggested = nextWorkday(new Date(today));
+            dateInput.value = suggested.toISOString().split('T')[0];
+
+            // عند تغيير التاريخ — تحقق إذا عطلة
+            dateInput.addEventListener('change', function() {
+                const d = new Date(this.value + 'T00:00:00');
+                const day = d.getDay();
+                if (day === 5 || day === 6) {
+                    alert('يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس');
+                    // عد لأقرب يوم عمل
+                    const next = nextWorkday(new Date(d));
+                    this.value = next.toISOString().split('T')[0];
+                }
+            });
+        })();
+
+        // ── التحقق من ساعات الدوام ──
+        const OPEN_H = 7, OPEN_M = 0;
+        const CLOSE_H = 15, CLOSE_M = 30;
+
+        function toMins(h, m) { return h * 60 + m; }
+        function parseTime(val) {
+            const [h, m] = val.split(':').map(Number);
+            return toMins(h, m);
+        }
+
+        const OPEN  = toMins(OPEN_H, OPEN_M);
+        const CLOSE = toMins(CLOSE_H, CLOSE_M);
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const visitDate = document.getElementById('visitDate').value;
+            const arrival   = document.querySelector('[name="arrival"]').value;
+            const departure = document.querySelector('[name="departure"]').value;
+
+            if (!visitDate || !arrival || !departure) return;
+
+            // تحقق من يوم العمل
+            const d = new Date(visitDate + 'T00:00:00');
+            const day = d.getDay();
+            if (day === 5 || day === 6) {
+                e.preventDefault();
+                alert('يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس');
+                return;
+            }
+
+            const arrMins = parseTime(arrival);
+            const depMins = parseTime(departure);
+
+            // تحقق من ساعات الدوام
+            if (arrMins < OPEN || arrMins > CLOSE) {
+                e.preventDefault();
+                alert('وقت الوصول خارج ساعات العمل (07:00 ص — 03:30 م)');
+                return;
+            }
+            if (depMins < OPEN || depMins > CLOSE) {
+                e.preventDefault();
+                alert('وقت المغادرة خارج ساعات العمل (07:00 ص — 03:30 م)');
+                return;
+            }
+            if (depMins <= arrMins) {
+                e.preventDefault();
+                alert('وقت المغادرة يجب أن يكون بعد وقت الوصول');
+                return;
+            }
+
+            // إذا اليوم ذا — الوقت ما يكون مضى
+            const today = new Date().toISOString().split('T')[0];
+            if (visitDate === today) {
+                const nowMins = toMins(new Date().getHours(), new Date().getMinutes());
+                if (nowMins > CLOSE) {
+                    e.preventDefault();
+                    alert('الشركة مغلقة اليوم — اختر يوم عمل قادم');
+                    return;
+                }
+                if (arrMins < nowMins) {
+                    e.preventDefault();
+                    alert('وقت الوصول مضى — اختر وقتاً مستقبلياً أو حجز ليوم قادم');
+                    return;
+                }
+            }
+
+            // نجح
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
