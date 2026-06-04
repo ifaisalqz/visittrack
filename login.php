@@ -43,11 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script>tailwind.config = { darkMode: 'class' }</script>
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
-<body class="bg-[#0B1120] flex items-center justify-center min-h-screen p-6">
+<body class="bg-[#0B1120] min-h-screen flex flex-col">
 
     <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
 
-    
+    <?php include 'includes/main_nav.php'; ?>
+
+    <main class="flex-1 flex items-center justify-center p-6"></div>
+
     <div class="max-w-md w-full bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl p-10 border border-slate-800">
 
         <div class="text-center mb-10">
@@ -84,12 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </button>
         </form>
 
-        <div class="mt-10 text-center">
-            <a href="index.php" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-slate-400 hover:text-blue-400 rounded-xl transition-all font-bold text-xs uppercase tracking-widest border border-transparent">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Back to Home
-            </a>
-        </div>
+
+
     </div>
+    </main>
+
+    <?php include 'includes/main_footer.php'; ?>
 </body>
 </html>

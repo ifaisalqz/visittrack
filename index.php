@@ -58,9 +58,6 @@
         </div>
     </main>
 
-    <footer class="p-6 text-center text-[10px] font-black uppercase tracking-widest text-slate-700">
-        &copy; <?php echo date('Y'); ?> Visit Track. All rights reserved.
-    </footer>
-
+    <?php include 'includes/main_footer.php'; ?>
 </body>
 </html>

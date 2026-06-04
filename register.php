@@ -277,5 +277,6 @@
         }).then(() => { window.location.href = 'visitor_status.php?tid=' + tid; });
     }
     </script>
+    <?php include 'includes/main_footer.php'; ?>
 </body>
 </html>

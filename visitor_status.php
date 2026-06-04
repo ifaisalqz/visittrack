@@ -137,5 +137,6 @@ if ($visitor) {
     if (elActive   && tid) new QRCode(elActive,   Object.assign({ text: tid }, qrOptions));
     if (elArchived && tid) new QRCode(elArchived, Object.assign({ text: tid }, qrOptions));
     </script>
+    <?php include 'includes/main_footer.php'; ?>
 </body>
 </html>
