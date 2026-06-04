@@ -18,10 +18,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dayOfWeek = (int)date('N', strtotime($visit_date)); // 1=Mon...7=Sun
     $phpDay    = (int)date('w', strtotime($visit_date)); // 0=Sun,5=Fri,6=Sat
     if ($phpDay === 5 || $phpDay === 6) {
-        die("<script>alert('يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس'); window.history.back();</script>");
+        die("<script>alert('Friday and Saturday are weekends. Please select Sunday to Thursday.'); window.history.back();</script>");
     }
     if ($visit_date < date('Y-m-d')) {
-        die("<script>alert('تاريخ الزيارة مضى — اختر تاريخاً مستقبلياً'); window.history.back();</script>");
+        die("<script>alert('Visit date has passed. Please choose a future date.'); window.history.back();</script>");
     }
 
     // ── التحقق من ساعات الدوام ──
@@ -33,17 +33,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($visit_date === date('Y-m-d')) {
         $nowMins = (int)date('H')*60 + (int)date('i');
         if ($nowMins > $CLOSE) {
-            die("<script>alert('الشركة مغلقة اليوم — اختر يوم عمل قادم'); window.history.back();</script>");
+            die("<script>alert('The company is closed today. Please select an upcoming workday.'); window.history.back();</script>");
         }
         if ($toMins($arrival) < $nowMins) {
-            die("<script>alert('وقت الوصول مضى — اختر وقتاً مستقبلياً'); window.history.back();</script>");
+            die("<script>alert('Arrival time has passed. Please choose a future time.'); window.history.back();</script>");
         }
     }
     if ($toMins($arrival) < $OPEN || $toMins($arrival) > $CLOSE) {
-        die("<script>alert('وقت الوصول خارج ساعات العمل (07:00 ص — 03:30 م)'); window.history.back();</script>");
+        die("<script>alert('Arrival time is outside working hours (7:00 AM - 3:30 PM).'); window.history.back();</script>");
     }
     if ($toMins($departure) < $OPEN || $toMins($departure) > $CLOSE) {
-        die("<script>alert('وقت المغادرة خارج ساعات العمل (07:00 ص — 03:30 م)'); window.history.back();</script>");
+        die("<script>alert('Departure time is outside working hours (7:00 AM - 3:30 PM).'); window.history.back();</script>");
     }
 
     $car_model    = trim($_POST['car_model']);

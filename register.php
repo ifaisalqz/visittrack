@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" class="dark" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = { darkMode: 'class' }
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark')
-        }
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-        }
-    </script>
+    <script>tailwind.config = { darkMode: "class" }</script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s; }
         .font-style-normal { font-style: normal !important; }
@@ -92,7 +83,7 @@
                         <label class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest ml-1 font-style-normal">Visit Date</label>
                         <input type="date" name="visit_date" id="visitDate" required
                                class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-black dark:text-white text-sm">
-                        <p class="text-[10px] font-bold text-slate-400 ml-1">أيام العمل: الأحد — الخميس فقط</p>
+                        <p class="text-[10px] font-bold text-slate-400 ml-1">Working days: Sunday to Thursday only</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
@@ -151,7 +142,7 @@
                 const d = new Date(this.value + 'T00:00:00');
                 const day = d.getDay();
                 if (day === 5 || day === 6) {
-                    alert('يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس');
+                    alert("Friday and Saturday are weekends. Please select Sunday to Thursday.")
                     // عد لأقرب يوم عمل
                     const next = nextWorkday(new Date(d));
                     this.value = next.toISOString().split('T')[0];
@@ -184,7 +175,7 @@
             const day = d.getDay();
             if (day === 5 || day === 6) {
                 e.preventDefault();
-                alert('يوم الجمعة والسبت عطلة — اختر من الأحد إلى الخميس');
+                alert("Friday and Saturday are weekends. Please select Sunday to Thursday.")
                 return;
             }
 
@@ -194,17 +185,17 @@
             // تحقق من ساعات الدوام
             if (arrMins < OPEN || arrMins > CLOSE) {
                 e.preventDefault();
-                alert('وقت الوصول خارج ساعات العمل (07:00 ص — 03:30 م)');
+                alert("Arrival time is outside working hours (7:00 AM - 3:30 PM).")
                 return;
             }
             if (depMins < OPEN || depMins > CLOSE) {
                 e.preventDefault();
-                alert('وقت المغادرة خارج ساعات العمل (07:00 ص — 03:30 م)');
+                alert("Departure time is outside working hours (7:00 AM - 3:30 PM).")
                 return;
             }
             if (depMins <= arrMins) {
                 e.preventDefault();
-                alert('وقت المغادرة يجب أن يكون بعد وقت الوصول');
+                alert("Departure time must be after arrival time.")
                 return;
             }
 
@@ -214,12 +205,12 @@
                 const nowMins = toMins(new Date().getHours(), new Date().getMinutes());
                 if (nowMins > CLOSE) {
                     e.preventDefault();
-                    alert('الشركة مغلقة اليوم — اختر يوم عمل قادم');
+                    alert("Company is closed today. Please select a future workday.")
                     return;
                 }
                 if (arrMins < nowMins) {
                     e.preventDefault();
-                    alert('وقت الوصول مضى — اختر وقتاً مستقبلياً أو حجز ليوم قادم');
+                    alert("Arrival time has already passed. Choose a future time or book for another day.")
                     return;
                 }
             }
